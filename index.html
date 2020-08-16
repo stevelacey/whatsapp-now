@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WhatsApp Now</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#6de033">
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+    <meta name="msapplication-TileColor" content="#6de033">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body class="bg-green-400 h-full flex items-center">
+    <h1 class="hidden text-3xl mx-auto my-10 text-center">
+        WhatsApp Now
+    </h1>
+
+    <div class="w-full max-w-xs px-10 mx-auto text-center">
+        <form
+            action="https://api.whatsapp.com/send"
+            id="form"
+        >
+            <img
+                src="/logo.png"
+                class='w-20 h-20 mx-auto mb-6'
+                alt="WhatsApp Now"
+            >
+
+            <label class="hidden text-gray-700 text-sm font-bold mb-2" for="phone">
+                Phone Number
+            </label>
+
+            <div class="relative mb-6">
+                <span id="flag" class="bg-gray-100 w-12 h-full text-2xl absolute left-0 flex items-center justify-center pointer-events-none"></span>
+
+                <input
+                    class="shadow appearance-none border rounded w-full py-3 px-4 pl-16 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="phone"
+                    name="phone"
+                    inputmode="tel"
+                    pattern="\+?[0-9\(\)\-\s]+"
+                    type="tel"
+                    placeholder="+# (###) ###-####"
+                    required
+                />
+            </div>
+
+            <button
+                class="bg-white hover:bg-green-700 text-green-600 hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit"
+            >
+                Send Message
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/awesome-phonenumber@2.36.0/lib/index.min.js"></script>
+
+    <script>
+        const flag = document.getElementById('flag')
+        const form = document.getElementById('form')
+        const phone = document.getElementById('phone')
+
+        const FLAG_LETTER_EMOJI_FIRST_OFFSET = 55356
+        const FLAG_LETTER_EMOJI_SECOND_OFFSET = 56741
+
+        const countryCodeToFlag = countryCode => {
+            return String.fromCharCode(
+                FLAG_LETTER_EMOJI_FIRST_OFFSET,
+                FLAG_LETTER_EMOJI_SECOND_OFFSET + countryCode.charCodeAt(0),
+                FLAG_LETTER_EMOJI_FIRST_OFFSET,
+                FLAG_LETTER_EMOJI_SECOND_OFFSET + countryCode.charCodeAt(1),
+            )
+        }
+
+        let localCountryCode = 'US'
+        let localDialingCode = 1
+
+        fetch('https://ipinfo.io/country')
+            .then(response => response.text())
+            .then(text => {
+                localCountryCode = text.trim()
+                localDialingCode = new PhoneNumber('', localCountryCode).getCountryCode()
+                flag.innerText = countryCodeToFlag(localCountryCode)
+            })
+
+        phone.addEventListener('input', e => {
+            const phoneNumber = new PhoneNumber(e.target.value, localCountryCode)
+            const countryCode = phoneNumber.getRegionCode()
+
+            if (countryCode) {
+                flag.innerText = countryCodeToFlag(countryCode)
+            }
+        })
+
+        form.addEventListener('submit', e => {
+            e.preventDefault()
+
+            let number = phone.value
+
+            if (number[0] !== '+') {
+                number = localDialingCode + number.replace(/^0/, '')
+            }
+
+            window.location = form.action + '?phone=' + number.replace(/[^0-9]/g, '')
+        })
+    </script>
+</body>
+</html>
