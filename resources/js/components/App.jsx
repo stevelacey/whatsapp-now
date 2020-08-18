@@ -17,17 +17,37 @@ export class App extends React.Component {
             value: '',
         }
 
-        fetch('https://ipinfo.io/country')
+        this.getPosition()
+            .then(({ coords }) => this.fetchGeoCountry(coords))
+            .catch(() => this.fetchIpCountry())
+    }
+
+    getPosition() {
+        return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject))
+    }
+
+    fetchGeoCountry({ latitude, longitude }) {
+        return fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+            .then(response => response.json())
+            .then(({ address }) => {
+                this.localize(address.country_code.toUpperCase())
+            })
+    }
+
+    fetchIpCountry() {
+        return fetch('https://ipinfo.io/country')
             .then(response => response.text())
             .then(text => {
-                const countryCode = text.trim()
-
-                this.setState({
-                    countryCode,
-                    localCountryCode: countryCode,
-                    localDialingCode: new PhoneNumber('', countryCode).getCountryCode(),
-                })
+                this.localize(text.trim())
             })
+    }
+
+    localize(countryCode) {
+        this.setState({
+            countryCode,
+            localCountryCode: countryCode,
+            localDialingCode: new PhoneNumber('', countryCode).getCountryCode(),
+        })
     }
 
     handleInput(value) {
