@@ -18,7 +18,7 @@ export class App extends React.Component {
         }
 
         this.getPosition()
-            .then(({ coords }) => this.fetchGeoCountry(coords))
+            .then(({ coords }) => this.geocodeGeoNames(coords).catch(() => this.geocodeOpenStreetMap(coords)))
             .catch(() => this.fetchIpCountry())
     }
 
@@ -26,20 +26,22 @@ export class App extends React.Component {
         return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject))
     }
 
-    fetchGeoCountry({ latitude, longitude }) {
+    geocodeGeoNames({ latitude, longitude }) {
+        return fetch(`https://secure.geonames.org/countryCode?lat=${latitude}&lng=${longitude}&username=secret`)
+            .then(response => response.text())
+            .then(text => this.localize(text.trim()))
+    }
+
+    geocodeOpenStreetMap({ latitude, longitude }) {
         return fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
             .then(response => response.json())
-            .then(({ address }) => {
-                this.localize(address.country_code.toUpperCase())
-            })
+            .then(({ address }) => this.localize(address.country_code.toUpperCase()))
     }
 
     fetchIpCountry() {
         return fetch('https://ipinfo.io/country')
             .then(response => response.text())
-            .then(text => {
-                this.localize(text.trim())
-            })
+            .then(text => this.localize(text.trim()))
     }
 
     localize(countryCode) {
