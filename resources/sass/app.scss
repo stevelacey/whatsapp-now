@@ -8,7 +8,16 @@ html, body {
     height: 100%;
 }
 
+html {
+    font-size: 2.25vh;
+
+    @media (display-mode: standalone) {
+        font-size: 2.5vh;
+    }
+}
+
 body {
+    min-width: 16rem;
     touch-action: none;
     user-select: none;
 }

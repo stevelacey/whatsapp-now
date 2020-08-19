@@ -129,7 +129,7 @@ export class App extends React.Component {
                 </div>
 
                 <KeyPad
-                    className="mb-6"
+                    className="mb-10"
                     showPlus={!this.state.value.length}
                     onChange={value => this.handleInput(this.state.value + value)}
                     onDelete={() => this.handleInput(this.state.value.slice(0, -1))}
