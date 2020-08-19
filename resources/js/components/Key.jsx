@@ -10,10 +10,10 @@ export class Key extends React.Component {
                 type="button"
                 repeatDelay={500}
                 repeatInterval={32}
-                onClick={e => this.props.onClick(e)}
+                onClick={e => this.props.onClick && this.props.onClick(e)}
                 onHold={e => this.props.onHold && this.props.onHold(e)}
             >
-                {this.props.value}
+                {this.props.value || this.props.children}
             </Repeatable>
         )
     }

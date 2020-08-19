@@ -17,9 +17,28 @@ html {
 }
 
 body {
+    @apply bg-green-700;
+    @apply text-white;
+
     min-width: 16rem;
+    padding-bottom: 3.5rem;
     touch-action: none;
     user-select: none;
+    overflow: hidden;
+
+    &:before {
+        background-image: url(https://images.unsplash.com/photo-1554481923-a6918bd997bc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=1);
+        background-position: center center;
+        background-size: cover;
+        content: '';
+        position: absolute;
+        top: -10vh;
+        left: -10vw;
+        width: 120vw;
+        height: 120vh;
+        filter: blur(10px);
+        z-index: -1;
+    }
 }
 
 .key {
@@ -27,43 +46,25 @@ body {
     @apply w-16;
     @apply h-16;
     @apply mx-auto;
-    @apply text-2xl;
+    @apply text-4xl;
     @apply flex;
     @apply items-center;
     @apply justify-center;
 
     &:focus {
         @apply outline-none;
-        @apply shadow-outline;
     }
 }
 
 .phone-input {
+    @apply bg-transparent;
     @apply appearance-none;
-    @apply border;
-    @apply rounded;
-    @apply shadow;
     @apply w-full;
-    @apply px-16;
+    @apply px-4;
     @apply py-3;
-    @apply text-gray-700;
-
-    &:focus {
-        @apply outline-none;
-        @apply shadow-outline;
-    }
-}
-
-.phone-input-addon {
-    @apply bg-gray-100;
-    @apply border;
-    @apply absolute;
-    @apply top-0;
-    @apply w-12;
-    @apply h-full;
-    @apply flex;
-    @apply items-center;
-    @apply justify-center;
+    @apply text-center;
+    @apply text-4xl;
+    @apply text-white;
 
     &:focus {
         @apply outline-none;
@@ -71,7 +72,8 @@ body {
 }
 
 .send-btn {
-    @apply bg-green-700;
+    @apply bg-green-600;
+    @apply bg-opacity-75;
     @apply fixed;
     @apply bottom-0;
     @apply left-0;
@@ -80,10 +82,8 @@ body {
     @apply font-bold;
     @apply px-4;
     @apply py-4;
-    @apply rounded;
 
     &:focus {
         @apply outline-none;
-        @apply shadow-outline;
     }
 }

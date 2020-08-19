@@ -1,7 +1,6 @@
 import React from 'react'
 import PhoneNumber from 'awesome-phonenumber'
 
-import { Flag } from './Flag'
 import { KeyPad } from './KeyPad'
 
 export class App extends React.Component {
@@ -52,7 +51,9 @@ export class App extends React.Component {
         })
     }
 
-    handleInput(value) {
+    handleChange(raw) {
+        const number = raw.replace(/[^0-9+]/g, '')
+        const value = number.slice(0, 1) + number.slice(1).replace(/[^0-9]/g, '')
         const phoneNumber = new PhoneNumber(value, this.state.localCountryCode)
         const countryCode = phoneNumber.getRegionCode()
 
@@ -64,7 +65,7 @@ export class App extends React.Component {
     }
 
     handlePaste() {
-        navigator.clipboard.readText().then(value => this.handleInput(value))
+        navigator.clipboard.readText && navigator.clipboard.readText().then(value => this.handleChange(value))
     }
 
     handleSubmit(e) {
@@ -87,12 +88,11 @@ export class App extends React.Component {
         return (
             <form
                 action={this.action}
-                className="w-full max-w-xs px-5 pb-5 mx-auto text-center"
                 onSubmit={e => this.handleSubmit(e)}
             >
                 <img
                     src="/logo.png"
-                    className='w-20 h-20 mx-auto mb-6'
+                    className='w-20 h-20 mx-auto mb-3'
                     alt="WhatsApp Now"
                     onDoubleClick={() => window.location.reload()}
                 />
@@ -101,38 +101,25 @@ export class App extends React.Component {
                     Phone Number
                 </label>
 
-                <div className="relative mb-6">
-                    <Flag
-                        className="phone-input-addon left-0 text-2xl pointer-events-none"
-                        countryCode={this.state.countryCode}
-                    />
-
-                    <input
-                        className="phone-input"
-                        id="phone"
-                        name="phone"
-                        inputMode="tel"
-                        pattern="\+?[0-9\(\)\-\s]+"
-                        type="tel"
-                        placeholder="+# (###) ###-####"
-                        value={this.state.value}
-                        onChange={e => this.handleInput(e.target.value)}
-                    />
-
-                    <button
-                        className="phone-input-addon right-0 text-sm"
-                        type="button"
-                        onClick={() => this.state.value.length ? this.handleInput('') : this.handlePaste()}
-                    >
-                        {this.state.value.length ? '❌' : '📋'}
-                    </button>
-                </div>
+                <input
+                    className="phone-input mb-3"
+                    id="phone"
+                    name="phone"
+                    inputMode="tel"
+                    pattern="\+?[0-9]+"
+                    type="tel"
+                    value={this.state.value}
+                    onChange={e => this.handleChange(e.target.value)}
+                    onClick={() => this.handlePaste()}
+                />
 
                 <KeyPad
-                    className="mb-10"
+                    className="w-64 mx-auto"
+                    countryCode={this.state.countryCode}
+                    showFlag={this.state.value.length > 2}
                     showPlus={!this.state.value.length}
-                    onChange={value => this.handleInput(this.state.value + value)}
-                    onDelete={() => this.handleInput(this.state.value.slice(0, -1))}
+                    onChange={value => this.handleChange(this.state.value + value)}
+                    onDelete={() => this.handleChange(this.state.value.slice(0, -1))}
                 />
 
                 <button
