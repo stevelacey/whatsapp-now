@@ -1,15 +1,20 @@
 import React from 'react'
+import Repeatable from 'react-repeatable';
 
 export class Key extends React.Component {
     render() {
         return (
-            <button
+            <Repeatable
                 className={`key ${this.props.className}`}
-                onClick={e => this.props.onClick(e)}
+                tag="button"
                 type="button"
+                repeatDelay={500}
+                repeatInterval={32}
+                onClick={e => this.props.onClick(e)}
+                onHold={e => this.props.onHold && this.props.onHold(e)}
             >
                 {this.props.value}
-           </button>
+            </Repeatable>
         )
     }
 }

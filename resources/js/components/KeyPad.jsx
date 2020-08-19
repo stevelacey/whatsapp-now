@@ -34,6 +34,7 @@ export class KeyPad extends React.Component {
                 <Key
                     value="⌫"
                     onClick={() => this.handleDelete()}
+                    onHold={() => this.handleDelete()}
                 />
             </div>
         )
