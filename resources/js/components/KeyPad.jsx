@@ -26,10 +26,14 @@ export class KeyPad extends React.Component {
 
                 {
                     this.props.showPlus
-                        ? <Key value="+" onClick={() => this.handleClick('+')}/>
-                        : <Key className="pointer-events-none">
-                            {this.props.showFlag ? <Flag countryCode={this.props.countryCode}/> : ''}
-                          </Key>
+                        ? (
+                            <Key value="+" onClick={() => this.handleClick('+')}/>
+                        )
+                        : (
+                            <Key className="pointer-events-none">
+                                {this.props.showFlag && <Flag countryCode={this.props.countryCode}/>}
+                            </Key>
+                        )
                 }
 
                 <Key
@@ -38,11 +42,13 @@ export class KeyPad extends React.Component {
                     onClick={() => this.handleClick(0)}
                 />
 
-                <Key
-                    value="⌫"
-                    onClick={() => this.handleDelete()}
-                    onHold={() => this.handleDelete()}
-                />
+                {this.props.showDelete && (
+                    <Key
+                        value="⌫"
+                        onClick={() => this.handleDelete()}
+                        onHold={() => this.handleDelete()}
+                    />
+                )}
             </div>
         )
     }

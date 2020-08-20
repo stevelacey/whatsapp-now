@@ -116,8 +116,9 @@ export class App extends React.Component {
                 <KeyPad
                     className="w-64 mx-auto"
                     countryCode={this.state.countryCode}
+                    showDelete={this.state.value.length > 0}
                     showFlag={this.state.value.length > 2}
-                    showPlus={!this.state.value.length}
+                    showPlus={this.state.value.length === 0}
                     onChange={value => this.handleChange(this.state.value + value)}
                     onDelete={() => this.handleChange(this.state.value.slice(0, -1))}
                 />
