@@ -3,11 +3,12 @@ import PhoneNumber from 'awesome-phonenumber'
 
 import { KeyPad } from './KeyPad'
 
+const actionUrl = 'https://api.whatsapp.com/send'
+const regionCodes = PhoneNumber.getSupportedRegionCodes()
+
 export class App extends React.Component {
     constructor(props) {
         super(props)
-
-        this.action = 'https://api.whatsapp.com/send'
 
         this.state = {
             countryCode: null,
@@ -51,13 +52,19 @@ export class App extends React.Component {
         })
     }
 
-    handleChange(raw) {
-        const number = raw.replace(/[^0-9+]/g, '')
-        const value = number.slice(0, 1) + number.slice(1).replace(/[^0-9]/g, '')
-        const phoneNumber = new PhoneNumber(value, this.state.localCountryCode)
-        const countryCode = phoneNumber.getRegionCode()
+    formatNumber(text) {
+        const value = text.replace(/[^0-9+]/g, '')
 
-        if (countryCode) {
+        return value.slice(0, 1) + value.slice(1).replace(/[^0-9]/g, '')
+    }
+
+    handleChange(text) {
+        const value = this.formatNumber(text)
+        const phoneNumber = new PhoneNumber(value, this.state.localCountryCode)
+        const regionCode = phoneNumber.getRegionCode()
+        const countryCode = regionCodes.includes(regionCode) ? regionCode : null
+
+        if (countryCode || value[0] === '+') {
             this.setState({ countryCode })
         }
 
@@ -81,13 +88,15 @@ export class App extends React.Component {
             value = this.state.localDialingCode + value.replace(/^0/, '')
         }
 
-        window.location = this.action + '?phone=' + value.replace(/[^0-9]/g, '')
+        window.location = actionUrl + '?phone=' + value.replace(/[^0-9]/g, '')
     }
 
     render() {
+        const { countryCode, value } = this.state
+
         return (
             <form
-                action={this.action}
+                action={actionUrl}
                 onSubmit={e => this.handleSubmit(e)}
             >
                 <img
@@ -108,19 +117,19 @@ export class App extends React.Component {
                     inputMode="tel"
                     pattern="\+?[0-9]+"
                     type="tel"
-                    value={this.state.value}
+                    value={value}
                     onChange={e => this.handleChange(e.target.value)}
                     onClick={() => this.handlePaste()}
                 />
 
                 <KeyPad
                     className="w-64 mx-auto"
-                    countryCode={this.state.countryCode}
-                    showDelete={this.state.value.length > 0}
-                    showFlag={this.state.value.length > 2}
-                    showPlus={this.state.value.length === 0}
-                    onChange={value => this.handleChange(this.state.value + value)}
-                    onDelete={() => this.handleChange(this.state.value.slice(0, -1))}
+                    countryCode={countryCode}
+                    showDelete={value.length >= 1}
+                    showFlag={value.length === 1 && value !== '+' || value.length >= 2}
+                    showPlus={value.length === 0}
+                    onInput={e => this.handleChange(value + e.detail)}
+                    onDelete={() => this.handleChange(value.slice(0, -1))}
                 />
 
                 <button

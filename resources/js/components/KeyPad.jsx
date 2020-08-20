@@ -5,11 +5,11 @@ import { Key } from './Key'
 
 export class KeyPad extends React.Component {
     handleClick(key) {
-        this.props.onChange && this.props.onChange(key)
+        this.props.onInput && this.props.onInput(new CustomEvent('input', { detail: key }))
     }
 
     handleDelete() {
-        this.props.onDelete && this.props.onDelete()
+        this.props.onDelete && this.props.onDelete(new CustomEvent('delete'))
     }
 
     render() {
