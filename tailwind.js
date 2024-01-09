@@ -1,9 +1,6 @@
 module.exports = {
-    purge: [
+    content: [
         "./public/index.html",
         "./resources/js/**/*.jsx",
     ],
-    theme: {},
-    variants: {},
-    plugins: [],
 }
