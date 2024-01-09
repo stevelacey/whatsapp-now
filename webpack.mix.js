@@ -1,6 +1,6 @@
-let mix = require('laravel-mix')
+let mix = require("laravel-mix")
 
-require('laravel-mix-tailwind')
+require("laravel-mix-tailwind")
 
 /*
  |--------------------------------------------------------------------------
@@ -13,6 +13,6 @@ require('laravel-mix-tailwind')
  |
  */
 
-mix.js('resources/js/app.js', 'public/js').react()
-   .sass('resources/sass/app.scss', 'public/css')
+mix.js("resources/js/app.js", "public/js").react()
+   .css("resources/css/app.css", "public/css")
    .tailwind()
