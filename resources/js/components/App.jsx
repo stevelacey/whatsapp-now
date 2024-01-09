@@ -53,7 +53,10 @@ export class App extends React.Component {
     }
 
     formatNumber(text) {
-        const value = text.replace(/[^0-9+]/g, '')
+        const value = text
+            .replace(/https:\/\/wa\.me\/[+0]*/g, '+')
+            .replace(/[^0-9+]/g, '')
+            .replace(/^00/g, '+')
 
         return value.slice(0, 1) + value.slice(1).replace(/[^0-9]/g, '')
     }
