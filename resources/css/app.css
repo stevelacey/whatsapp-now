@@ -3,3 +3,19 @@
 @tailwind components;
 
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply h-full text-[2.25vh] pwa:text-[2.5vh];
+  }
+
+  :focus {
+    @apply outline-none;
+  }
+}
+
+@layer utilities {
+  .bg-rainbow {
+    background-image: linear-gradient(60deg, #6fba82, #07b39b, #1098ad, #5073b8);
+  }
+}

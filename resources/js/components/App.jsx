@@ -118,7 +118,6 @@ export class App extends React.Component {
             bg-transparent appearance-none
             w-full mb-3 px-4 py-3
             text-center text-4xl text-white
-            focus:outline-none
           "
           id="phone"
           name="phone"
@@ -140,16 +139,12 @@ export class App extends React.Component {
           onDelete={() => this.handleChange(value.slice(0, -1))}
         />
 
-        <button
-          className="
-            bg-green-600/75 font-bold text-white
-            fixed bottom-0 left-0 w-full p-4
-            focus:outline-none
-          "
-          type="submit"
-        >
-          Send Message
-        </button>
+          <button
+            className="bg-white/25 p-4 fixed inset-4 top-auto font-bold text-white rounded-full shadow"
+            type="submit"
+          >
+            Send Message
+          </button>
       </form>
     )
   }

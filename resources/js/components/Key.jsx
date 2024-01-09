@@ -8,7 +8,6 @@ export class Key extends React.Component {
         className={`
           flex w-16 h-16 mx-auto text-4xl items-center justify-center rounded-full
           ${this.props.className}
-          focus:outline-none
         `}
         tag="button"
         type="button"
