@@ -75,7 +75,7 @@ export class App extends React.Component {
   }
 
   handlePaste() {
-    navigator.clipboard.readText && navigator.clipboard.readText().then(value => this.handleChange(value))
+    navigator.clipboard.readText().then(value => this.handleChange(value))
   }
 
   handleSubmit(e) {
@@ -126,17 +126,19 @@ export class App extends React.Component {
           type="tel"
           value={value}
           onChange={e => this.handleChange(e.target.value)}
-          onClick={() => this.handlePaste()}
         />
 
         <KeyPad
           className="w-64 mx-auto"
           countryCode={countryCode}
+          isIOS={/iPad|iPhone|iPod/.test(navigator.userAgent)}
           showDelete={value.length >= 1}
           showFlag={value.length === 1 && value !== '+' || value.length >= 2}
+          showPaste={value.length === 0}
           showPlus={value.length === 0}
-          onInput={e => this.handleChange(value + e.detail)}
           onDelete={() => this.handleChange(value.slice(0, -1))}
+          onInput={e => this.handleChange(value + e.detail)}
+          onPaste={() => this.handlePaste()}
         />
 
           <button
