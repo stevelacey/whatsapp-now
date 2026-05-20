@@ -62,7 +62,16 @@ export class App extends React.Component {
   }
 
   handleChange(text) {
-    const value = this.formatNumber(text)
+    let value = this.formatNumber(text)
+
+    if (value && value[0] !== '+' && value[0] !== '0') {
+      const plusValue = '+' + value;
+      const pn = new PhoneNumber(plusValue, this.state.localCountryCode);
+      if (pn.isValid()) {
+        value = plusValue
+      }
+    }
+
     const phoneNumber = new PhoneNumber(value, this.state.localCountryCode)
     const regionCode = phoneNumber.getRegionCode()
     const countryCode = regionCodes.includes(regionCode) ? regionCode : null
