@@ -1,6 +1,8 @@
 import React from 'react'
 import PhoneNumber from 'awesome-phonenumber'
 
+import { CountrySelect } from './CountrySelect'
+import { Flag } from './Flag'
 import { KeyPad } from './KeyPad'
 
 const actionUrl = 'https://api.whatsapp.com/send'
@@ -12,10 +14,12 @@ export class App extends React.Component {
 
     this.state = {
       countryCode: null,
+      detectedCountryCode: null,
       localCountryCode: 'US',
       localDialingCode: 1,
       value: '',
-    }
+      showCountrySelect: false,
+    };
 
     this.getPosition()
       .then(({ coords }) => this.geocodeGeoNames(coords).catch(() => this.geocodeOpenStreetMap(coords)))
@@ -47,6 +51,7 @@ export class App extends React.Component {
   localize(countryCode) {
     this.setState({
       countryCode,
+      detectedCountryCode: countryCode,
       localCountryCode: countryCode,
       localDialingCode: new PhoneNumber('', countryCode).getCountryCode(),
     })
@@ -83,8 +88,53 @@ export class App extends React.Component {
     this.setState({ value })
   }
 
+  openCountrySelect() {
+    this.setState({ showCountrySelect: true })
+  }
+
+  closeCountrySelect() {
+    this.setState({ showCountrySelect: false })
+  }
+
+
   handlePaste() {
-    navigator.clipboard.readText().then(value => this.handleChange(value))
+    navigator.clipboard.readText().then(text => this.handleChange(text))
+  }
+
+  selectCountry(newCode) {
+    const pn = new PhoneNumber('', newCode)
+    const dialing = pn.getCountryCode()
+    const current = this.state.value
+    // If there is an existing number, replace its leading dialing code with the new one
+    if (current && current.startsWith('+')) {
+      // Determine current dialing code based on current country selection (if any)
+      const oldCountry = this.state.countryCode
+      const oldDialing = oldCountry ? new PhoneNumber('', oldCountry).getCountryCode() : null
+      let newValue = current
+      if (oldDialing && current.startsWith('+' + oldDialing)) {
+        newValue = '+' + dialing + current.slice(('+' + oldDialing).length)
+      } else {
+        // Fallback: replace the leading '+' and any digits up to first non-digit after the country code
+        newValue = '+' + dialing + current.replace(/^\+\d+/, '').replace(/^\+/, '')
+        // Ensure we don't duplicate the dialing code
+        if (newValue.startsWith('+' + dialing + dialing)) {
+          newValue = '+' + dialing + newValue.slice(('+' + dialing).length)
+        }
+      }
+      this.setState({ countryCode: newCode, value: newValue, showCountrySelect: false })
+    } else {
+      // No existing number, just set to new dialing code
+      this.setState({ countryCode: newCode, value: `+${dialing}`, showCountrySelect: false })
+    }
+  }
+
+  // Helper to get sorted region codes by country name
+  getSortedRegionCodes() {
+    return regionCodes.slice().sort((a, b) => {
+      const nameA = this.getCountryName(a)
+      const nameB = this.getCountryName(b)
+      return nameA.localeCompare(nameB)
+    })
   }
 
   handleSubmit(e) {
@@ -103,8 +153,16 @@ export class App extends React.Component {
     window.location = actionUrl + '?phone=' + value.replace(/[^0-9]/g, '')
   }
 
+  getCountryName(code) {
+    if (typeof Intl !== 'undefined' && Intl.DisplayNames) {
+      const dn = new Intl.DisplayNames(['en'], { type: 'region' })
+      return dn.of(code) || code
+    }
+    return code
+  }
+
   render() {
-    const { countryCode, value } = this.state
+    const { countryCode, value = '' } = this.state
 
     return (
       <form
@@ -144,18 +202,28 @@ export class App extends React.Component {
           showDelete={value.length >= 1}
           showFlag={value.length === 1 && value !== '+' || value.length >= 2}
           showPaste={value.length === 0}
-          showPlus={value.length === 0}
           onDelete={() => this.handleChange(value.slice(0, -1))}
           onInput={e => this.handleChange(value + e.detail)}
           onPaste={() => this.handlePaste()}
+          onFlagClick={() => this.openCountrySelect()}
         />
+          {this.state.showCountrySelect && (
+            <CountrySelect
+              onClose={() => this.closeCountrySelect()}
+              onSelect={rc => this.selectCountry(rc)}
+              countryCode={this.state.countryCode}
+              detectedCountryCode={this.state.detectedCountryCode}
+              sortedRegionCodes={this.getSortedRegionCodes()}
+              getCountryName={rc => this.getCountryName(rc)}
+            />
+          )}
 
-          <button
-            className="bg-white/25 p-4 fixed inset-4 top-auto font-bold text-white rounded-full shadow"
-            type="submit"
-          >
-            Send Message
-          </button>
+        <button
+          className="bg-white/25 p-4 fixed inset-4 top-auto font-bold text-white rounded-full shadow"
+          type="submit"
+        >
+          Send Message
+        </button>
       </form>
     )
   }
